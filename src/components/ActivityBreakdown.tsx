@@ -38,7 +38,7 @@ const ActivityBreakdown = ({ members }: ActivityBreakdownProps) => {
                 <Footprints className="h-4 w-4 text-blue-500" />
                 <span className="text-sm font-medium">Walking</span>
               </div>
-              <span className="text-sm font-bold">{totalWalking.1}km ({walkingPercentage}%)</span>
+              <span className="text-sm font-bold">{totalWalking.toFixed(1)}km ({walkingPercentage}%)</span>
             </div>
             <Progress value={walkingPercentage} className="h-2" />
           </div>
