@@ -2,14 +2,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Medal, Award, Flame, Calendar } from "lucide-react";
+import { Trophy, Medal, Award, Flame, Calendar, Activity, Footprints } from "lucide-react";
 
 interface FamilyMember {
   name: string;
   kilometers: number;
+  walkingKm: number;
+  runningKm: number;
   lastActivity: string;
   streak: number;
   avatar: string;
+  gender?: string;
+  age?: number;
 }
 
 interface FamilyLeaderboardProps {
@@ -109,7 +113,22 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
                   
                   <div>
                     <h3 className="font-semibold text-lg">{member.name}</h3>
+                    {member.age && member.gender && (
+                      <p className="text-xs text-gray-500">{member.age}y, {member.gender}</p>
+                    )}
                     <p className="text-2xl font-bold text-blue-600">{member.kilometers}km</p>
+                  </div>
+                  
+                  {/* Activity Breakdown */}
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className="flex items-center space-x-1">
+                      <Footprints className="h-3 w-3 text-blue-500" />
+                      <span>{member.walkingKm.toFixed(1)}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Activity className="h-3 w-3 text-orange-500" />
+                      <span>{member.runningKm.toFixed(1)}</span>
+                    </div>
                   </div>
                   
                   <div className="flex items-center space-x-1">
@@ -159,6 +178,22 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Calendar className="h-3 w-3" />
                         <span>Last: {member.lastActivity}</span>
+                        {member.age && member.gender && (
+                          <>
+                            <span>•</span>
+                            <span>{member.age}y, {member.gender}</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-3 text-xs mt-1">
+                        <div className="flex items-center space-x-1">
+                          <Footprints className="h-3 w-3 text-blue-500" />
+                          <span>{member.walkingKm.toFixed(1)}km walking</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Activity className="h-3 w-3 text-orange-500" />
+                          <span>{member.runningKm.toFixed(1)}km running</span>
+                        </div>
                       </div>
                     </div>
                   </div>

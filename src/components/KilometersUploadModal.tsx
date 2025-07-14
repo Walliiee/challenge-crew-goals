@@ -12,11 +12,13 @@ interface KilometersUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (data: any) => void;
+  familyMembers: any[];
 }
 
-const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadModalProps) => {
+const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: KilometersUploadModalProps) => {
   const [kilometers, setKilometers] = useState("");
   const [activityType, setActivityType] = useState("");
+  const [selectedMember, setSelectedMember] = useState("");
   const [notes, setNotes] = useState("");
 
   const activityTypes = [
@@ -31,6 +33,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadM
     const data = {
       kilometers: parseFloat(kilometers),
       activityType,
+      memberName: selectedMember,
       notes,
       timestamp: new Date().toISOString()
     };
@@ -41,6 +44,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadM
     // Reset form
     setKilometers("");
     setActivityType("");
+    setSelectedMember("");
     setNotes("");
   };
 
@@ -52,19 +56,35 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadM
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Activity className="h-5 w-5 mr-2 text-green-500" />
-            Log Your Kilometers
+            Log Kilometers
           </DialogTitle>
           <DialogDescription>
-            Add your distance to the family challenge
+            Add kilometers for a family member
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="activity">Activity Type</Label>
-            <Select onValueChange={setActivityType}>
+            <Label htmlFor="member">Family Member</Label>
+            <Select onValueChange={setSelectedMember} required>
               <SelectTrigger>
-                <SelectValue placeholder="Choose your activity" />
+                <SelectValue placeholder="Select family member" />
+              </SelectTrigger>
+              <SelectContent>
+                {familyMembers.map((member) => (
+                  <SelectItem key={member.name} value={member.name}>
+                    {member.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="activity">Activity Type</Label>
+            <Select onValueChange={setActivityType} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose activity" />
               </SelectTrigger>
               <SelectContent>
                 {activityTypes.map((activity) => (
@@ -79,7 +99,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadM
             </Select>
           </div>
 
-          {selectedActivity && (
+          {selectedActivity && selectedMember && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="kilometers">Distance (kilometers)</Label>
@@ -132,10 +152,10 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess }: KilometersUploadM
             </Button>
             <Button 
               type="submit" 
-              disabled={!activityType || !kilometers}
+              disabled={!activityType || !kilometers || !selectedMember}
               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
             >
-              Add to Family Total
+              Log Activity
             </Button>
           </DialogFooter>
         </form>

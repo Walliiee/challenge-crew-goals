@@ -1,35 +1,121 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Users, Plus, Target, Calendar, Flame } from "lucide-react";
+import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus } from "lucide-react";
 import FamilyLeaderboard from "@/components/FamilyLeaderboard";
 import KilometersUploadModal from "@/components/KilometersUploadModal";
+import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
+import ActivityBreakdown from "@/components/ActivityBreakdown";
 import CelebrationModal from "@/components/CelebrationModal";
 
 const Index = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [celebrationData, setCelebrationData] = useState(null);
+  const [familyMembers, setFamilyMembers] = useState([
+    { 
+      name: "Sarah", 
+      kilometers: 67.2, 
+      walkingKm: 35.1, 
+      runningKm: 32.1, 
+      lastActivity: "Today", 
+      streak: 12, 
+      avatar: "S",
+      gender: "female",
+      age: 28
+    },
+    { 
+      name: "Mike", 
+      kilometers: 52.8, 
+      walkingKm: 20.3, 
+      runningKm: 32.5, 
+      lastActivity: "Today", 
+      streak: 8, 
+      avatar: "M",
+      gender: "male",
+      age: 32
+    },
+    { 
+      name: "Emma", 
+      kilometers: 43.1, 
+      walkingKm: 28.7, 
+      runningKm: 14.4, 
+      lastActivity: "Yesterday", 
+      streak: 15, 
+      avatar: "E",
+      gender: "female",
+      age: 16
+    },
+    { 
+      name: "Alex", 
+      kilometers: 24.4, 
+      walkingKm: 15.2, 
+      runningKm: 9.2, 
+      lastActivity: "2 days ago", 
+      streak: 5, 
+      avatar: "A",
+      gender: "male",
+      age: 14
+    }
+  ]);
 
   // Family kilometers challenge data
   const familyChallenge = {
     title: "Family Kilometers Challenge",
     description: "Let's reach 500km together this month!",
     totalGoal: 500,
-    totalProgress: 187.5,
+    totalProgress: familyMembers.reduce((sum, member) => sum + member.kilometers, 0),
     endDate: "2025-01-31",
     daysLeft: 20
   };
 
-  const familyMembers = [
-    { name: "Sarah", kilometers: 67.2, lastActivity: "Today", streak: 12, avatar: "S" },
-    { name: "Mike", kilometers: 52.8, lastActivity: "Today", streak: 8, avatar: "M" },
-    { name: "Emma", kilometers: 43.1, lastActivity: "Yesterday", streak: 15, avatar: "E" },
-    { name: "Alex", kilometers: 24.4, lastActivity: "2 days ago", streak: 5, avatar: "A" }
-  ];
+  // Load family members from localStorage on component mount
+  useEffect(() => {
+    const savedMembers = localStorage.getItem('familyMembers');
+    if (savedMembers) {
+      setFamilyMembers(JSON.parse(savedMembers));
+    }
+  }, []);
 
-  const handleCelebration = (type, data) => {
+  // Save family members to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('familyMembers', JSON.stringify(familyMembers));
+  }, [familyMembers]);
+
+  const handleAddMember = (newMember: any) => {
+    setFamilyMembers(prev => [...prev, newMember]);
+  };
+
+  const handleKilometerLog = (data: any) => {
+    const { kilometers, activityType, memberName } = data;
+    
+    setFamilyMembers(prev => prev.map(member => {
+      if (member.name === memberName) {
+        const updatedMember = {
+          ...member,
+          kilometers: member.kilometers + kilometers,
+          lastActivity: "Today",
+          streak: member.lastActivity === "Today" ? member.streak : member.streak + 1
+        };
+
+        // Update activity-specific kilometers
+        if (activityType === 'walking') {
+          updatedMember.walkingKm += kilometers;
+        } else if (activityType === 'running') {
+          updatedMember.runningKm += kilometers;
+        }
+
+        return updatedMember;
+      }
+      return member;
+    }));
+
+    handleCelebration("upload", data);
+  };
+
+  const handleCelebration = (type: string, data: any) => {
     setCelebrationData({ type, data });
   };
 
@@ -39,7 +125,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-r from-blue-500 to-orange-500 p-2 rounded-lg">
@@ -52,18 +138,28 @@ const Index = () => {
                 <p className="text-sm text-gray-600">Working together, achieving more</p>
               </div>
             </div>
-            <Button 
-              onClick={() => setIsUploadModalOpen(true)}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Log Kilometers
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => setIsAddMemberModalOpen(true)}
+                variant="outline"
+                className="border-blue-200 hover:bg-blue-50"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Member
+              </Button>
+              <Button 
+                onClick={() => setIsUploadModalOpen(true)}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Log Kilometers
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Main Challenge Card */}
         <Card className="mb-8 bg-gradient-to-r from-blue-500 to-orange-500 text-white">
           <CardHeader>
@@ -83,7 +179,7 @@ const Index = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Family Progress</span>
-                  <span className="text-sm">{familyChallenge.totalProgress}km / {familyChallenge.totalGoal}km</span>
+                  <span className="text-sm">{familyChallenge.totalProgress.toFixed(1)}km / {familyChallenge.totalGoal}km</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-3">
                   <div 
@@ -120,7 +216,7 @@ const Index = () => {
         </Card>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Leaderboard */}
           <div className="lg:col-span-2">
             <FamilyLeaderboard 
@@ -129,24 +225,33 @@ const Index = () => {
             />
           </div>
 
+          {/* Activity Breakdown */}
+          <div className="lg:col-span-1">
+            <ActivityBreakdown members={familyMembers} />
+          </div>
+
           {/* Quick Actions & Info */}
-          <div className="space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
                   <Target className="h-5 w-5 mr-2 text-green-500" />
-                  Quick Log
+                  Quick Actions
                 </CardTitle>
-                <CardDescription>
-                  Add your kilometers quickly
-                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <Button 
                   onClick={() => setIsUploadModalOpen(true)}
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 >
-                  Log My Kilometers
+                  Log Kilometers
+                </Button>
+                <Button 
+                  onClick={() => setIsAddMemberModalOpen(true)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Add Family Member
                 </Button>
               </CardContent>
             </Card>
@@ -186,7 +291,7 @@ const Index = () => {
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Remaining:</span>
-                  <span className="font-medium">{familyChallenge.totalGoal - familyChallenge.totalProgress}km</span>
+                  <span className="font-medium">{(familyChallenge.totalGoal - familyChallenge.totalProgress).toFixed(1)}km</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Daily Target:</span>
@@ -194,7 +299,7 @@ const Index = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Family Average:</span>
-                  <span className="font-medium">{Math.round(familyChallenge.totalProgress / familyMembers.length * 10) / 10}km</span>
+                  <span className="font-medium">{(familyChallenge.totalProgress / familyMembers.length).toFixed(1)}km</span>
                 </div>
               </CardContent>
             </Card>
@@ -206,7 +311,14 @@ const Index = () => {
       <KilometersUploadModal 
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        onSuccess={(data) => handleCelebration("upload", data)}
+        onSuccess={handleKilometerLog}
+        familyMembers={familyMembers}
+      />
+
+      <AddFamilyMemberModal 
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        onSuccess={handleAddMember}
       />
 
       {celebrationData && (
