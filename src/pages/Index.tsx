@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,52 +13,7 @@ const Index = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [celebrationData, setCelebrationData] = useState(null);
-  const [familyMembers, setFamilyMembers] = useState([
-    { 
-      name: "Sarah", 
-      kilometers: 67.2, 
-      walkingKm: 35.1, 
-      runningKm: 32.1, 
-      lastActivity: "Today", 
-      streak: 12, 
-      avatar: "S",
-      gender: "female",
-      age: 28
-    },
-    { 
-      name: "Mike", 
-      kilometers: 52.8, 
-      walkingKm: 20.3, 
-      runningKm: 32.5, 
-      lastActivity: "Today", 
-      streak: 8, 
-      avatar: "M",
-      gender: "male",
-      age: 32
-    },
-    { 
-      name: "Emma", 
-      kilometers: 43.1, 
-      walkingKm: 28.7, 
-      runningKm: 14.4, 
-      lastActivity: "Yesterday", 
-      streak: 15, 
-      avatar: "E",
-      gender: "female",
-      age: 16
-    },
-    { 
-      name: "Alex", 
-      kilometers: 24.4, 
-      walkingKm: 15.2, 
-      runningKm: 9.2, 
-      lastActivity: "2 days ago", 
-      streak: 5, 
-      avatar: "A",
-      gender: "male",
-      age: 14
-    }
-  ]);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   // Family kilometers challenge data
   const familyChallenge = {
