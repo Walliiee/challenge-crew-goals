@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Activity, Footprints, Bike, MapPin } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Activity, Footprints, Bike, Waves, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface KilometersUploadModalProps {
   isOpen: boolean;
@@ -20,12 +24,13 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
   const [activityType, setActivityType] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
   const [notes, setNotes] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const activityTypes = [
     { id: "running", name: "Running", icon: Activity },
     { id: "walking", name: "Walking", icon: Footprints },
     { id: "cycling", name: "Cycling", icon: Bike },
-    { id: "hiking", name: "Hiking", icon: MapPin }
+    { id: "swimming", name: "Swimming", icon: Waves }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,6 +40,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
       activityType,
       memberName: selectedMember,
       notes,
+      date: selectedDate.toISOString(),
       timestamp: new Date().toISOString()
     };
     
@@ -46,6 +52,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
     setActivityType("");
     setSelectedMember("");
     setNotes("");
+    setSelectedDate(new Date());
   };
 
   const selectedActivity = activityTypes.find(a => a.id === activityType);
@@ -101,6 +108,34 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
 
           {selectedActivity && selectedMember && (
             <>
+              <div className="space-y-2">
+                <Label>Activity Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => date && setSelectedDate(date)}
+                      disabled={(date) => date > new Date()}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="kilometers">Distance (kilometers)</Label>
                 <Input
