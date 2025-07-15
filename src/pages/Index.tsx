@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -161,7 +162,7 @@ const Index = () => {
                   <p className="text-xs text-blue-100">Active Today</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{Math.max(...familyMembers.map(m => m.streak))}</p>
+                  <p className="text-2xl font-bold">{familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.streak)) : 0}</p>
                   <p className="text-xs text-blue-100">Best Streak</p>
                 </div>
               </div>
@@ -253,7 +254,7 @@ const Index = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Family Average:</span>
-                  <span className="font-medium">{(familyChallenge.totalProgress / familyMembers.length).toFixed(1)}km</span>
+                  <span className="font-medium">{familyMembers.length > 0 ? (familyChallenge.totalProgress / familyMembers.length).toFixed(1) : '0.0'}km</span>
                 </div>
               </CardContent>
             </Card>
