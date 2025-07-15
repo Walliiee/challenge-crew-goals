@@ -19,10 +19,10 @@ const Index = () => {
   // Family kilometers challenge data
   const familyChallenge = {
     title: "Family Kilometers Challenge",
-    description: "Let's reach 500km together this month!",
-    totalGoal: 500,
+    description: "Let's reach 300km together this month!",
+    totalGoal: 300,
     totalProgress: familyMembers.reduce((sum, member) => sum + member.kilometers, 0),
-    endDate: "2025-01-31",
+    endDate: "2025-07-31",
     daysLeft: 20
   };
 
