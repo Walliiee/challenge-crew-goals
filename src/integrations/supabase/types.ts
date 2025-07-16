@@ -14,7 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          activity_type: string
+          created_at: string
+          date: string
+          family_member_id: string
+          id: string
+          kilometers: number
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          date?: string
+          family_member_id: string
+          id?: string
+          kilometers: number
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          date?: string
+          family_member_id?: string
+          id?: string
+          kilometers?: number
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_challenges: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          is_active: boolean
+          start_date: string
+          title: string
+          total_goal: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean
+          start_date?: string
+          title: string
+          total_goal: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          start_date?: string
+          title?: string
+          total_goal?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      family_members: {
+        Row: {
+          avatar: string
+          created_at: string
+          id: string
+          kilometers: number
+          last_activity: string | null
+          name: string
+          running_km: number
+          streak: number
+          updated_at: string
+          user_id: string
+          walking_km: number
+        }
+        Insert: {
+          avatar: string
+          created_at?: string
+          id?: string
+          kilometers?: number
+          last_activity?: string | null
+          name: string
+          running_km?: number
+          streak?: number
+          updated_at?: string
+          user_id: string
+          walking_km?: number
+        }
+        Update: {
+          avatar?: string
+          created_at?: string
+          id?: string
+          kilometers?: number
+          last_activity?: string | null
+          name?: string
+          running_km?: number
+          streak?: number
+          updated_at?: string
+          user_id?: string
+          walking_km?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

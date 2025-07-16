@@ -1,77 +1,96 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus } from "lucide-react";
+import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus, LogOut } from "lucide-react";
 import FamilyLeaderboard from "@/components/FamilyLeaderboard";
 import KilometersUploadModal from "@/components/KilometersUploadModal";
 import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
 import CelebrationModal from "@/components/CelebrationModal";
+import { useFamilyMembers } from "@/hooks/useFamilyMembers";
+import { useActivityLogs } from "@/hooks/useActivityLogs";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [celebrationData, setCelebrationData] = useState(null);
-  const [familyMembers, setFamilyMembers] = useState([]);
+  
+  const { familyMembers, addMember, updateMember } = useFamilyMembers();
+  const { addActivity } = useActivityLogs();
+  const { user, signOut } = useAuth();
 
   // Family kilometers challenge data
   const familyChallenge = {
     title: "Family Kilometers Challenge",
     description: "Let's reach 300km together this month!",
     totalGoal: 300,
-    totalProgress: familyMembers.reduce((sum, member) => sum + member.kilometers, 0),
+    totalProgress: familyMembers.reduce((sum, member) => sum + Number(member.kilometers), 0),
     endDate: "2025-07-31",
     daysLeft: 20
   };
 
-  // Load family members from localStorage on component mount
-  useEffect(() => {
-    const savedMembers = localStorage.getItem('familyMembers');
-    if (savedMembers) {
-      setFamilyMembers(JSON.parse(savedMembers));
+  const handleAddMember = async (newMember: any) => {
+    try {
+      await addMember({
+        name: newMember.name,
+        avatar: newMember.avatar,
+        kilometers: 0,
+        walking_km: 0,
+        running_km: 0,
+        last_activity: 'Never',
+        streak: 0
+      });
+    } catch (error) {
+      console.error('Error adding member:', error);
     }
-  }, []);
-
-  // Save family members to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('familyMembers', JSON.stringify(familyMembers));
-  }, [familyMembers]);
-
-  const handleAddMember = (newMember: any) => {
-    setFamilyMembers(prev => [...prev, newMember]);
   };
 
-  const handleKilometerLog = (data: any) => {
+  const handleKilometerLog = async (data: any) => {
     const { kilometers, activityType, memberName } = data;
     
-    setFamilyMembers(prev => prev.map(member => {
-      if (member.name === memberName) {
-        const updatedMember = {
-          ...member,
-          kilometers: member.kilometers + kilometers,
-          lastActivity: "Today",
-          streak: member.lastActivity === "Today" ? member.streak : member.streak + 1
-        };
+    try {
+      // Find the family member
+      const member = familyMembers.find(m => m.name === memberName);
+      if (!member) return;
 
-        // Update activity-specific kilometers
-        if (activityType === 'walking') {
-          updatedMember.walkingKm += kilometers;
-        } else if (activityType === 'running') {
-          updatedMember.runningKm += kilometers;
-        }
+      // Add activity log
+      await addActivity({
+        family_member_id: member.id,
+        activity_type: activityType,
+        kilometers: Number(kilometers),
+        date: new Date().toISOString().split('T')[0],
+        notes: data.notes || null
+      });
 
-        return updatedMember;
+      // Update family member stats
+      const updatedMember = {
+        kilometers: Number(member.kilometers) + Number(kilometers),
+        last_activity: "Today",
+        streak: member.last_activity === "Today" ? member.streak : member.streak + 1
+      };
+
+      if (activityType === 'walking') {
+        updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
+      } else if (activityType === 'running') {
+        updatedMember.running_km = Number(member.running_km) + Number(kilometers);
       }
-      return member;
-    }));
 
-    handleCelebration("upload", data);
+      await updateMember({ id: member.id, ...updatedMember });
+      
+      handleCelebration("upload", data);
+    } catch (error) {
+      console.error('Error logging kilometers:', error);
+    }
   };
 
   const handleCelebration = (type: string, data: any) => {
     setCelebrationData({ type, data });
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   const progressPercentage = Math.round((familyChallenge.totalProgress / familyChallenge.totalGoal) * 100);
@@ -94,6 +113,18 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-600 hidden sm:block">
+                Welcome, {user?.email}
+              </span>
+              <Button 
+                onClick={handleSignOut}
+                variant="outline"
+                size="sm"
+                className="border-red-200 hover:bg-red-50 text-red-600"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
               <Button 
                 onClick={() => setIsAddMemberModalOpen(true)}
                 variant="outline"
@@ -158,7 +189,7 @@ const Index = () => {
                   <p className="text-xs text-blue-100">Family Members</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{familyMembers.filter(m => m.lastActivity === "Today").length}</p>
+                  <p className="text-2xl font-bold">{familyMembers.filter(m => m.last_activity === "Today").length}</p>
                   <p className="text-xs text-blue-100">Active Today</p>
                 </div>
                 <div className="text-center">
@@ -217,9 +248,9 @@ const Index = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {familyMembers
-                  .filter(member => member.lastActivity === "Today")
+                  .filter(member => member.last_activity === "Today")
                   .map((member) => (
-                    <div key={member.name} className="flex items-center space-x-3 p-2 bg-green-50 rounded-lg">
+                    <div key={member.id} className="flex items-center space-x-3 p-2 bg-green-50 rounded-lg">
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                         {member.avatar}
                       </div>
@@ -233,7 +264,7 @@ const Index = () => {
                       </div>
                     </div>
                   ))}
-                {familyMembers.filter(member => member.lastActivity === "Today").length === 0 && (
+                {familyMembers.filter(member => member.last_activity === "Today").length === 0 && (
                   <p className="text-gray-500 text-sm text-center py-4">No one has logged today yet!</p>
                 )}
               </CardContent>
