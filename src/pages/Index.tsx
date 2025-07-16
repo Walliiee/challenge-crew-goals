@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,7 +73,7 @@ const Index = () => {
       });
 
       // Update family member stats
-      const updatedMember = {
+      const updatedMember: any = {
         kilometers: Number(member.kilometers) + Number(kilometers),
         last_activity: "Today",
         streak: member.last_activity === "Today" ? member.streak : member.streak + 1
