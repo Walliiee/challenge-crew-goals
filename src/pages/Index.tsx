@@ -8,6 +8,7 @@ import KilometersUploadModal from "@/components/KilometersUploadModal";
 import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
 import CelebrationModal from "@/components/CelebrationModal";
+import ActivityCalendar from "@/components/ActivityCalendar";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +21,14 @@ const Index = () => {
   const { familyMembers, addMember, updateMember } = useFamilyMembers();
   const { addActivity } = useActivityLogs();
   const { user, signOut } = useAuth();
+
+  // Transform database data to match component interface
+  const transformedMembers = familyMembers.map(member => ({
+    ...member,
+    walkingKm: member.walking_km,
+    runningKm: member.running_km,
+    lastActivity: member.last_activity
+  }));
 
   // Family kilometers challenge data
   const familyChallenge = {
@@ -202,22 +211,24 @@ const Index = () => {
         </Card>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Leaderboard */}
           <div className="lg:col-span-2">
             <FamilyLeaderboard 
-              members={familyMembers}
+              members={transformedMembers}
               onCelebration={handleCelebration}
             />
           </div>
 
-          {/* Activity Breakdown */}
-          <div className="lg:col-span-1">
-            <ActivityBreakdown members={familyMembers} />
-          </div>
-
-          {/* Quick Actions & Info */}
+          {/* Right Column */}
           <div className="lg:col-span-1 space-y-6">
+            {/* Activity Breakdown */}
+            <ActivityBreakdown members={transformedMembers} />
+
+            {/* Activity Calendar */}
+            <ActivityCalendar />
+
+            {/* Quick Actions & Info */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
