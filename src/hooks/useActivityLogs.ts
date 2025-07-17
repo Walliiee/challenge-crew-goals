@@ -12,14 +12,11 @@ export const useActivityLogs = () => {
   const queryClient = useQueryClient();
 
   const { data: activityLogs = [], isLoading, error } = useQuery({
-    queryKey: ['activity-logs', user?.id],
+    queryKey: ['activity-logs'],
     queryFn: async () => {
-      if (!user) return [];
-      
       const { data, error } = await supabase
         .from('activity_logs')
         .select('*, family_members(*)')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

@@ -13,14 +13,11 @@ export const useFamilyMembers = () => {
   const queryClient = useQueryClient();
 
   const { data: familyMembers = [], isLoading, error } = useQuery({
-    queryKey: ['family-members', user?.id],
+    queryKey: ['family-members'],
     queryFn: async () => {
-      if (!user) return [];
-      
       const { data, error } = await supabase
         .from('family_members')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
