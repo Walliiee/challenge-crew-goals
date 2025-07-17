@@ -3,15 +3,18 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Footprints, Bike, Calendar as CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import EditActivityModal from "@/components/EditActivityModal";
+import { Activity, Footprints, Bike, Calendar as CalendarIcon, Pencil } from "lucide-react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { format, parseISO, isSameDay } from "date-fns";
 
 const ActivityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const { activityLogs } = useActivityLogs();
-  const { familyMembers } = useFamilyMembers();
+  const [editingActivity, setEditingActivity] = useState<any | null>(null);
+  const { activityLogs, updateActivity } = useActivityLogs();
+  const { familyMembers, updateMember } = useFamilyMembers();
 
   // Get activities for the selected date
   const selectedDateActivities = activityLogs.filter(log => 
@@ -50,6 +53,62 @@ const ActivityCalendar = () => {
   const getMemberName = (familyMemberId: string) => {
     const member = familyMembers.find(m => m.id === familyMemberId);
     return member?.name || 'Unknown';
+  };
+
+  const handleSaveEdit = async (data: any) => {
+    if (!editingActivity) return;
+    const old = editingActivity;
+
+    const newMember = familyMembers.find(m => m.name === data.memberName);
+    const oldMember = familyMembers.find(m => m.id === old.family_member_id);
+
+    if (!newMember || !oldMember) return;
+
+    await updateActivity({
+      id: old.id,
+      family_member_id: newMember.id,
+      activity_type: data.activityType,
+      kilometers: data.kilometers,
+      date: data.date,
+      notes: data.notes
+    });
+
+    if (oldMember.id === newMember.id) {
+      const diff = data.kilometers - Number(old.kilometers);
+      const updated: any = { kilometers: Number(oldMember.kilometers) + diff };
+
+      if (old.activity_type === 'walking') {
+        updated.walking_km = Number(oldMember.walking_km) - Number(old.kilometers);
+      } else if (old.activity_type === 'running') {
+        updated.running_km = Number(oldMember.running_km) - Number(old.kilometers);
+      }
+
+      if (data.activityType === 'walking') {
+        updated.walking_km = (updated.walking_km ?? Number(oldMember.walking_km)) + data.kilometers;
+      } else if (data.activityType === 'running') {
+        updated.running_km = (updated.running_km ?? Number(oldMember.running_km)) + data.kilometers;
+      }
+
+      await updateMember({ id: oldMember.id, ...updated });
+    } else {
+      const oldUpdate: any = { kilometers: Number(oldMember.kilometers) - Number(old.kilometers) };
+      if (old.activity_type === 'walking') {
+        oldUpdate.walking_km = Number(oldMember.walking_km) - Number(old.kilometers);
+      } else if (old.activity_type === 'running') {
+        oldUpdate.running_km = Number(oldMember.running_km) - Number(old.kilometers);
+      }
+      await updateMember({ id: oldMember.id, ...oldUpdate });
+
+      const newUpdate: any = { kilometers: Number(newMember.kilometers) + data.kilometers };
+      if (data.activityType === 'walking') {
+        newUpdate.walking_km = Number(newMember.walking_km) + data.kilometers;
+      } else if (data.activityType === 'running') {
+        newUpdate.running_km = Number(newMember.running_km) + data.kilometers;
+      }
+      await updateMember({ id: newMember.id, ...newUpdate });
+    }
+
+    setEditingActivity(null);
   };
 
   return (
@@ -95,7 +154,12 @@ const ActivityCalendar = () => {
                     </Badge>
                     <span className="text-sm font-medium">{getMemberName(activity.family_member_id)}</span>
                   </div>
-                  <span className="text-sm font-bold text-blue-600">{activity.kilometers}km</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-bold text-blue-600">{activity.kilometers}km</span>
+                    <Button variant="ghost" size="icon" onClick={() => setEditingActivity(activity)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
               
@@ -133,6 +197,13 @@ const ActivityCalendar = () => {
           </div>
         </div>
       </CardContent>
+      <EditActivityModal
+        isOpen={!!editingActivity}
+        onClose={() => setEditingActivity(null)}
+        onSave={handleSaveEdit}
+        familyMembers={familyMembers}
+        initialActivity={editingActivity}
+      />
     </Card>
   );
 };
