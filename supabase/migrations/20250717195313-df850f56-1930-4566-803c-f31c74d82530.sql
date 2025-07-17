@@ -1,4 +1,3 @@
-
 -- Update RLS policies to allow viewing all data but only editing your own
 -- Drop the overly permissive policies that were just created
 DROP POLICY IF EXISTS "Authenticated users can view all family members" ON public.family_members;
@@ -17,6 +16,18 @@ CREATE POLICY "Users can create their own family members"
   FOR INSERT 
   TO authenticated
   WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own family members"
+  ON public.family_members
+  FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own family members"
+  ON public.family_members
+  FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
 
 -- Activity Logs - All authenticated users can view, but only creators can modify  
 CREATE POLICY "Authenticated users can view all activity logs" 
