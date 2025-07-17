@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { Tables, TablesInsert } from '@/integrations/supabase/types';
+import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 
 type ActivityLog = Tables<'activity_logs'>;
 type ActivityLogInsert = TablesInsert<'activity_logs'>;
@@ -47,11 +47,31 @@ export const useActivityLogs = () => {
     }
   });
 
+  const updateActivityMutation = useMutation({
+    mutationFn: async ({ id, ...updates }: TablesUpdate<'activity_logs'> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('activity_logs')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['family-members'] });
+    }
+  });
+
   return {
     activityLogs,
     isLoading,
     error,
     addActivity: addActivityMutation.mutateAsync,
-    isAddingActivity: addActivityMutation.isPending
+    updateActivity: updateActivityMutation.mutateAsync,
+    isAddingActivity: addActivityMutation.isPending,
+    isUpdatingActivity: updateActivityMutation.isPending
   };
 };
