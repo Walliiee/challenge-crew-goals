@@ -58,27 +58,32 @@ const CreateChallengeModal = ({ isOpen, onClose }: CreateChallengeModalProps) =>
           <div className="space-y-3">
             <Label className="text-base font-semibold">Challenge Type</Label>
             <div className="grid grid-cols-2 gap-3">
-              {challengeTypes.map((type) => (
-                <Card 
-                  key={type.value}
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    challengeType === type.value ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                  }`}
-                  onClick={() => setChallengeType(type.value)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <type.icon className={`h-6 w-6 ${
-                        challengeType === type.value ? 'text-blue-600' : 'text-gray-600'
-                      }`} />
-                      <div>
-                        <h3 className="font-semibold">{type.label}</h3>
-                        <p className="text-sm text-gray-600">{type.description}</p>
+              {challengeTypes.map((type) => {
+                const Icon = type.icon;
+                return (
+                  <Card
+                    key={type.value}
+                    className={`cursor-pointer transition-all hover:shadow-md ${
+                      challengeType === type.value ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                    }`}
+                    onClick={() => setChallengeType(type.value)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <Icon
+                          className={`h-6 w-6 ${
+                            challengeType === type.value ? 'text-blue-600' : 'text-gray-600'
+                          }`}
+                        />
+                        <div>
+                          <h3 className="font-semibold">{type.label}</h3>
+                          <p className="text-sm text-gray-600">{type.description}</p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 

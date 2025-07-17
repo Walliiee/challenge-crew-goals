@@ -100,14 +100,17 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
                 <SelectValue placeholder="Choose activity" />
               </SelectTrigger>
               <SelectContent>
-                {activityTypes.map((activity) => (
-                  <SelectItem key={activity.id} value={activity.id}>
-                    <div className="flex items-center space-x-2">
-                      <activity.icon className="h-4 w-4" />
-                      <span>{activity.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
+                {activityTypes.map((activity) => {
+                  const Icon = activity.icon;
+                  return (
+                    <SelectItem key={activity.id} value={activity.id}>
+                      <div className="flex items-center space-x-2">
+                        <Icon className="h-4 w-4" />
+                        <span>{activity.name}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
