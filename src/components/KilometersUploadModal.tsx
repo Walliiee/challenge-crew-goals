@@ -40,7 +40,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
       activityType,
       memberName: selectedMember,
       notes,
-      date: selectedDate.toISOString(),
+      date: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD for database
       timestamp: new Date().toISOString()
     };
     

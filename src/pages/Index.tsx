@@ -56,19 +56,19 @@ const Index = () => {
   };
 
   const handleKilometerLog = async (data: any) => {
-    const { kilometers, activityType, memberName } = data;
+    const { kilometers, activityType, memberName, date } = data;
     
     try {
       // Find the family member
       const member = familyMembers.find(m => m.name === memberName);
       if (!member) return;
 
-      // Add activity log
+      // Add activity log with the selected date
       await addActivity({
         family_member_id: member.id,
         activity_type: activityType,
         kilometers: Number(kilometers),
-        date: new Date().toISOString().split('T')[0],
+        date: date, // Use the selected date from the form
         notes: data.notes || null
       });
 
