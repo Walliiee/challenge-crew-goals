@@ -8,6 +8,7 @@ import EditActivityModal from "@/components/EditActivityModal";
 import { Activity, Footprints, Bike, Calendar as CalendarIcon, Pencil } from "lucide-react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
+import { recalcMemberStreak } from "@/lib/streak";
 import { format, parseISO, isSameDay } from "date-fns";
 
 const ActivityCalendar = () => {
@@ -90,6 +91,7 @@ const ActivityCalendar = () => {
       }
 
       await updateMember({ id: oldMember.id, ...updated });
+      await recalcMemberStreak(oldMember.id);
     } else {
       const oldUpdate: any = { kilometers: Number(oldMember.kilometers) - Number(old.kilometers) };
       if (old.activity_type === 'walking') {
@@ -98,6 +100,7 @@ const ActivityCalendar = () => {
         oldUpdate.running_km = Number(oldMember.running_km) - Number(old.kilometers);
       }
       await updateMember({ id: oldMember.id, ...oldUpdate });
+      await recalcMemberStreak(oldMember.id);
 
       const newUpdate: any = { kilometers: Number(newMember.kilometers) + data.kilometers };
       if (data.activityType === 'walking') {
@@ -106,6 +109,7 @@ const ActivityCalendar = () => {
         newUpdate.running_km = Number(newMember.running_km) + data.kilometers;
       }
       await updateMember({ id: newMember.id, ...newUpdate });
+      await recalcMemberStreak(newMember.id);
     }
 
     setEditingActivity(null);

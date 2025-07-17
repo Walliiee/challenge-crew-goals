@@ -8,9 +8,11 @@ import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
 import CelebrationModal from "@/components/CelebrationModal";
 import ActivityCalendar from "@/components/ActivityCalendar";
+import LongestStreakLeaderboard from "@/components/LongestStreakLeaderboard";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useAuth } from "@/hooks/useAuth";
+import { recalcMemberStreak } from "@/lib/streak";
 
 const Index = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -18,7 +20,7 @@ const Index = () => {
   const [celebrationData, setCelebrationData] = useState(null);
   
   const { familyMembers, addMember, updateMember } = useFamilyMembers();
-  const { addActivity } = useActivityLogs();
+  const { addActivity, activityLogs } = useActivityLogs();
   const { user, signOut } = useAuth();
 
   // Transform database data to match component interface
@@ -72,11 +74,9 @@ const Index = () => {
         notes: data.notes || null
       });
 
-      // Update family member stats
+      // Update distance totals
       const updatedMember: any = {
-        kilometers: Number(member.kilometers) + Number(kilometers),
-        last_activity: "Today",
-        streak: member.last_activity === "Today" ? member.streak : member.streak + 1
+        kilometers: Number(member.kilometers) + Number(kilometers)
       };
 
       if (activityType === 'walking') {
@@ -86,7 +86,10 @@ const Index = () => {
       }
 
       await updateMember({ id: member.id, ...updatedMember });
-      
+
+      // Recalculate streak based on all logs
+      await recalcMemberStreak(member.id);
+
       handleCelebration("upload", data);
     } catch (error) {
       console.error('Error logging kilometers:', error);
@@ -279,6 +282,11 @@ const Index = () => {
                 )}
               </CardContent>
             </Card>
+
+            <LongestStreakLeaderboard
+              members={familyMembers}
+              activityLogs={activityLogs}
+            />
 
             <Card>
               <CardHeader>
