@@ -35,14 +35,20 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Format date properly as YYYY-MM-DD
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+    
     const data = {
       kilometers: parseFloat(kilometers),
       activityType,
       memberName: selectedMember,
       notes,
-      date: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD for database
+      date: formattedDate,
       timestamp: new Date().toISOString()
     };
+    
+    console.log('Submitting activity data:', data);
     
     onSuccess(data);
     onClose();
