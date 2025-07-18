@@ -23,7 +23,8 @@ const ProgressUploadModal = ({ isOpen, onClose, onSuccess }: ProgressUploadModal
   const activeChallenges = [
     { id: "1", name: "January Running Challenge", type: "running", unit: "km" },
     { id: "2", name: "Daily Steps Competition", type: "steps", unit: "steps" },
-    { id: "3", name: "Workout Warriors", type: "workout", unit: "sessions" }
+    { id: "3", name: "Workout Warriors", type: "workout", unit: "sessions" },
+    { id: "4", name: "Hyre Hoj", type: "hyre_hoj", unit: "trips" }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
