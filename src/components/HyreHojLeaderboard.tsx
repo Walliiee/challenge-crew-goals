@@ -12,35 +12,15 @@ const HyreHojLeaderboard = () => {
     const fetchLeaderboardData = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('activity_logs')
-        .select(`
-          kilometers,
-          family_members (
-            name,
-            avatar
-          )
-        `)
-        .eq('activity_type', 'hyre_hoj');
+        .from('family_members')
+        .select('name, avatar, hyre_hoj_trips')
+        .order('hyre_hoj_trips', { ascending: false });
 
       if (error) {
         console.error("Error fetching leaderboard data:", error);
         setLeaderboardData([]);
       } else {
-        const aggregatedData = data.reduce((acc, log) => {
-          const memberName = log.family_members.name;
-          if (!acc[memberName]) {
-            acc[memberName] = {
-              name: memberName,
-              avatar: log.family_members.avatar,
-              trips: 0,
-            };
-          }
-          acc[memberName].trips += log.kilometers;
-          return acc;
-        }, {} as any);
-
-        const sortedData = Object.values(aggregatedData).sort((a: any, b: any) => b.trips - a.trips);
-        setLeaderboardData(sortedData);
+        setLeaderboardData(data.map(member => ({...member, trips: member.hyre_hoj_trips})));
       }
       setLoading(false);
     };

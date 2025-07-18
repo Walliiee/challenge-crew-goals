@@ -84,6 +84,8 @@ const Index = () => {
         updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
       } else if (activityType === 'running') {
         updatedMember.running_km = Number(member.running_km) + Number(kilometers);
+      } else if (activityType === 'hyre_hoj') {
+        updatedMember.hyre_hoj_trips = Number(member.hyre_hoj_trips) + Number(kilometers);
       }
 
       await updateMember({ id: member.id, ...updatedMember });
