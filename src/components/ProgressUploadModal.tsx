@@ -8,10 +8,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, Camera, MapPin } from "lucide-react";
 
+export interface ProgressInput {
+  challenge: string
+  value: number
+  unit: string
+  notes: string
+  timestamp: string
+}
+
 interface ProgressUploadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (data: any) => void;
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: (data: ProgressInput) => void
 }
 
 const ProgressUploadModal = ({ isOpen, onClose, onSuccess }: ProgressUploadModalProps) => {

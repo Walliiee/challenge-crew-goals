@@ -7,10 +7,22 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserPlus } from "lucide-react";
 
+export interface NewFamilyMember {
+  name: string
+  gender: string
+  age: number
+  kilometers: number
+  walkingKm: number
+  runningKm: number
+  lastActivity: string
+  streak: number
+  avatar: string
+}
+
 interface AddFamilyMemberModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (member: any) => void;
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: (member: NewFamilyMember) => void
 }
 
 const AddFamilyMemberModal = ({ isOpen, onClose, onSuccess }: AddFamilyMemberModalProps) => {
