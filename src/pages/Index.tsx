@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus, LogOut } from "lucide-react";
+import { Trophy, Users, Plus, UserPlus, LogOut } from "lucide-react";
 import FamilyLeaderboard from "@/components/FamilyLeaderboard";
 import KilometersUploadModal from "@/components/KilometersUploadModal";
-import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
+import AddFamilyMemberModal, { NewFamilyMember } from "@/components/AddFamilyMemberModal";
+import FamilyChallengeCard from "@/components/FamilyChallengeCard";
+import QuickActionsCard from "@/components/QuickActionsCard";
+import TodayActivityList from "@/components/TodayActivityList";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
 import CelebrationModal from "@/components/CelebrationModal";
 import ActivityCalendar from "@/components/ActivityCalendar";
@@ -41,7 +44,7 @@ const Index = () => {
     daysLeft: 20
   };
 
-  const handleAddMember = async (newMember: any) => {
+  const handleAddMember = async (newMember: NewFamilyMember) => {
     try {
       await addMember({
         name: newMember.name,
@@ -104,7 +107,6 @@ const Index = () => {
     await signOut();
   };
 
-  const progressPercentage = Math.round((familyChallenge.totalProgress / familyChallenge.totalGoal) * 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
@@ -186,60 +188,16 @@ const Index = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
-        {/* Main Challenge Card */}
-        <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-blue-500 to-orange-500 text-white">
-          <CardHeader className="pb-4 sm:pb-6">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div className="min-w-0 flex-1">
-                <CardTitle className="text-xl sm:text-2xl mb-2 leading-tight">{familyChallenge.title}</CardTitle>
-                <CardDescription className="text-blue-100 text-sm sm:text-base">
-                  {familyChallenge.description}
-                </CardDescription>
-              </div>
-              <Target className="h-6 w-6 sm:h-8 sm:w-8 text-blue-200 flex-shrink-0" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Progress */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Family Progress</span>
-                  <span className="text-sm">{familyChallenge.totalProgress.toFixed(1)}km / {familyChallenge.totalGoal}km</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-3">
-                  <div 
-                    className="bg-white h-3 rounded-full transition-all duration-300" 
-                    style={{ width: `${progressPercentage}%` }}
-                  ></div>
-                </div>
-                <div className="flex items-center justify-between mt-2 text-sm">
-                  <span>{progressPercentage}% Complete</span>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{familyChallenge.daysLeft} days left</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-white/20">
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.length}</p>
-                  <p className="text-xs text-blue-100">Members</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.filter(m => m.last_activity === "Today").length}</p>
-                  <p className="text-xs text-blue-100">Active Today</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.streak)) : 0}</p>
-                  <p className="text-xs text-blue-100">Best Streak</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <FamilyChallengeCard
+          title={familyChallenge.title}
+          description={familyChallenge.description}
+          totalGoal={familyChallenge.totalGoal}
+          totalProgress={familyChallenge.totalProgress}
+          daysLeft={familyChallenge.daysLeft}
+          memberCount={familyMembers.length}
+          activeToday={familyMembers.filter(m => m.last_activity === "Today").length}
+          bestStreak={familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.streak)) : 0}
+        />
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
@@ -259,58 +217,12 @@ const Index = () => {
             {/* Activity Calendar */}
             <ActivityCalendar />
 
-            {/* Quick Actions & Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <Target className="h-5 w-5 mr-2 text-green-500" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  onClick={() => setIsUploadModalOpen(true)}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                >
-                  Log Kilometers
-                </Button>
-                <Button 
-                  onClick={() => setIsAddMemberModalOpen(true)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Add Family Member
-                </Button>
-              </CardContent>
-            </Card>
+            <QuickActionsCard
+              onLog={() => setIsUploadModalOpen(true)}
+              onAddMember={() => setIsAddMemberModalOpen(true)}
+            />
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Today's Activity</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {familyMembers
-                  .filter(member => member.last_activity === "Today")
-                  .map((member) => (
-                    <div key={member.id} className="flex items-center space-x-3 p-2 bg-green-50 rounded-lg">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {member.avatar}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{member.name}</p>
-                        <p className="text-xs text-gray-600">Logged today</p>
-                      </div>
-                      <div className="flex items-center space-x-1 text-orange-500">
-                        <Flame className="h-3 w-3" />
-                        <span className="text-xs font-medium">{member.streak}</span>
-                      </div>
-                    </div>
-                  ))}
-                {familyMembers.filter(member => member.last_activity === "Today").length === 0 && (
-                  <p className="text-gray-500 text-sm text-center py-4">No one has logged today yet!</p>
-                )}
-              </CardContent>
-            </Card>
+            <TodayActivityList members={familyMembers} />
 
             <LongestStreakLeaderboard
               members={familyMembers}

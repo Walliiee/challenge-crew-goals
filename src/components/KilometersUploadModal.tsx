@@ -12,11 +12,20 @@ import { Activity, Footprints, Bike, Waves, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
+export interface ActivityLogInput {
+  kilometers: number
+  activityType: string
+  memberName: string
+  notes: string
+  date: string
+  timestamp: string
+}
+
 interface KilometersUploadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (data: any) => void;
-  familyMembers: any[];
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: (data: ActivityLogInput) => void
+  familyMembers: { id: string; name: string }[]
 }
 
 const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: KilometersUploadModalProps) => {
