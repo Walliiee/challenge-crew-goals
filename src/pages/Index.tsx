@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus, LogOut } from "lucide-react";
 import FamilyLeaderboard from "@/components/FamilyLeaderboard";
+import HyreHojLeaderboard from "@/components/HyreHojLeaderboard";
 import KilometersUploadModal from "@/components/KilometersUploadModal";
 import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
@@ -212,11 +213,12 @@ const Index = () => {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Leaderboard */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <FamilyLeaderboard 
               members={transformedMembers}
               onCelebration={handleCelebration}
             />
+            <HyreHojLeaderboard />
           </div>
 
           {/* Right Column */}
