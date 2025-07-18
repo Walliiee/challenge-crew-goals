@@ -85,7 +85,7 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
       </div>
 
       {/* Top 3 Podium */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {sortedMembers.slice(0, 3).map((member, index) => {
           const positions = [1, 0, 2]; // For podium effect: 2nd, 1st, 3rd
           const actualPosition = positions[index];
@@ -93,50 +93,52 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
           return (
             <Card 
               key={member.name}
-              className={`text-center cursor-pointer hover:shadow-lg transition-all duration-200 ${
-                rank === 1 ? 'scale-105 border-2 border-yellow-200' : ''
+              className={`text-center cursor-pointer hover:shadow-lg transition-all duration-200 touch-manipulation ${
+                rank === 1 ? 'sm:scale-105 border-2 border-yellow-200' : ''
               }`}
-              style={{ order: actualPosition }}
+              style={{ order: window.innerWidth >= 640 ? actualPosition : index }}
               onClick={() => handleCelebration(member, rank)}
             >
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center space-y-3">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getRankBadgeColor(rank)}`}>
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex sm:flex-col items-center sm:items-center space-x-4 sm:space-x-0 sm:space-y-3">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 ${getRankBadgeColor(rank)}`}>
                     {getRankIcon(rank)}
                   </div>
                   
-                  <Avatar className="w-16 h-16">
-                    <AvatarFallback className="text-lg font-semibold bg-gradient-to-r from-blue-500 to-orange-500 text-white">
+                  <Avatar className="w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
+                    <AvatarFallback className="text-sm sm:text-lg font-semibold bg-gradient-to-r from-blue-500 to-orange-500 text-white">
                       {member.avatar}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div>
-                    <h3 className="font-semibold text-lg">{member.name}</h3>
+                  <div className="flex-1 sm:flex-none text-left sm:text-center">
+                    <h3 className="font-semibold text-base sm:text-lg truncate">{member.name}</h3>
                     {member.age && member.gender && (
                       <p className="text-xs text-gray-500">{member.age}y, {member.gender}</p>
                     )}
-                    <p className="text-2xl font-bold text-blue-600">{member.kilometers}km</p>
-                  </div>
-                  
-                  {/* Activity Breakdown */}
-                  <div className="flex items-center space-x-2 text-xs">
-                    <div className="flex items-center space-x-1">
-                      <Footprints className="h-3 w-3 text-blue-500" />
-                      <span>{member.walkingKm.toFixed(1)}</span>
+                    <p className="text-xl sm:text-2xl font-bold text-blue-600">{member.kilometers}km</p>
+                    
+                    {/* Activity Breakdown */}
+                    <div className="flex items-center space-x-2 text-xs mt-1 sm:justify-center">
+                      <div className="flex items-center space-x-1">
+                        <Footprints className="h-3 w-3 text-blue-500" />
+                        <span>{member.walkingKm.toFixed(1)}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Activity className="h-3 w-3 text-orange-500" />
+                        <span>{member.runningKm.toFixed(1)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Activity className="h-3 w-3 text-orange-500" />
-                      <span>{member.runningKm.toFixed(1)}</span>
+                    
+                    <div className="flex items-center space-x-1 mt-1 sm:justify-center">
+                      <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
+                      <span className="text-xs sm:text-sm font-medium">{member.streak} days</span>
+                    </div>
+                    
+                    <div className="mt-2">
+                      {getActivityBadge(member.lastActivity)}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-1">
-                    <Flame className="h-4 w-4 text-orange-500" />
-                    <span className="text-sm font-medium">{member.streak} day streak</span>
-                  </div>
-                  
-                  {getActivityBadge(member.lastActivity)}
                 </div>
               </CardContent>
             </Card>
@@ -159,54 +161,58 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
               return (
                 <div 
                   key={member.name}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer touch-manipulation"
                   onClick={() => handleCelebration(member, rank)}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center justify-center w-8 h-8">
+                  <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                    <div className="flex items-center justify-center w-8 h-8 flex-shrink-0">
                       {getRankIcon(rank)}
                     </div>
                     
-                    <Avatar className="w-10 h-10">
+                    <Avatar className="w-10 h-10 flex-shrink-0">
                       <AvatarFallback className="font-semibold bg-gradient-to-r from-blue-500 to-orange-500 text-white">
                         {member.avatar}
                       </AvatarFallback>
                     </Avatar>
                     
-                    <div>
-                      <h4 className="font-semibold">{member.name}</h4>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-semibold truncate">{member.name}</h4>
+                      <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
                         <Calendar className="h-3 w-3" />
-                        <span>Last: {member.lastActivity}</span>
+                        <span className="truncate">Last: {member.lastActivity}</span>
                         {member.age && member.gender && (
                           <>
-                            <span>•</span>
-                            <span>{member.age}y, {member.gender}</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="hidden sm:inline">{member.age}y, {member.gender}</span>
                           </>
                         )}
                       </div>
-                      <div className="flex items-center space-x-3 text-xs mt-1">
+                      <div className="flex items-center space-x-2 sm:space-x-3 text-xs mt-1">
                         <div className="flex items-center space-x-1">
                           <Footprints className="h-3 w-3 text-blue-500" />
-                          <span>{member.walkingKm.toFixed(1)}km walking</span>
+                          <span className="hidden sm:inline">{member.walkingKm.toFixed(1)}km walking</span>
+                          <span className="sm:hidden">{member.walkingKm.toFixed(1)}</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Activity className="h-3 w-3 text-orange-500" />
-                          <span>{member.runningKm.toFixed(1)}km running</span>
+                          <span className="hidden sm:inline">{member.runningKm.toFixed(1)}km running</span>
+                          <span className="sm:hidden">{member.runningKm.toFixed(1)}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Flame className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm font-medium">{member.streak}</span>
+                  <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
+                      <span className="text-xs sm:text-sm font-medium">{member.streak}</span>
                     </div>
                     
                     <div className="text-right">
-                      <p className="font-bold text-lg">{member.kilometers}km</p>
-                      {getActivityBadge(member.lastActivity)}
+                      <p className="font-bold text-base sm:text-lg">{member.kilometers}km</p>
+                      <div className="hidden sm:block">
+                        {getActivityBadge(member.lastActivity)}
+                      </div>
                     </div>
                   </div>
                 </div>

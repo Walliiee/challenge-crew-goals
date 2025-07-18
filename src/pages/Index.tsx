@@ -111,20 +111,49 @@ const Index = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-3 min-w-0 flex-1">
               <div className="bg-gradient-to-r from-blue-500 to-orange-500 p-2 rounded-lg">
-                <Trophy className="h-6 w-6 text-white" />
+                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent truncate">
                   Family Challenge
                 </h1>
-                <p className="text-sm text-gray-600">Working together, achieving more</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Working together, achieving more</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-600 hidden sm:block">
+            
+            {/* Mobile Actions */}
+            <div className="flex items-center space-x-2 sm:hidden">
+              <Button 
+                onClick={() => setIsUploadModalOpen(true)}
+                size="sm"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Button 
+                onClick={() => setIsAddMemberModalOpen(true)}
+                variant="outline"
+                size="sm"
+                className="border-blue-200 hover:bg-blue-50"
+              >
+                <UserPlus className="h-4 w-4" />
+              </Button>
+              <Button 
+                onClick={handleSignOut}
+                variant="outline"
+                size="sm"
+                className="border-red-200 hover:bg-red-50 text-red-600"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Desktop Actions */}
+            <div className="hidden sm:flex items-center space-x-3">
+              <span className="text-sm text-gray-600 hidden lg:block">
                 Welcome, {user?.email}
               </span>
               <Button 
@@ -134,7 +163,7 @@ const Index = () => {
                 className="border-red-200 hover:bg-red-50 text-red-600"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                <span className="hidden md:inline">Sign Out</span>
               </Button>
               <Button 
                 onClick={() => setIsAddMemberModalOpen(true)}
@@ -142,32 +171,32 @@ const Index = () => {
                 className="border-blue-200 hover:bg-blue-50"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                Add Member
+                <span className="hidden md:inline">Add Member</span>
               </Button>
               <Button 
                 onClick={() => setIsUploadModalOpen(true)}
                 className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Log Kilometers
+                <span className="hidden md:inline">Log Kilometers</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
         {/* Main Challenge Card */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-500 to-orange-500 text-white">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl mb-2">{familyChallenge.title}</CardTitle>
-                <CardDescription className="text-blue-100">
+        <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-blue-500 to-orange-500 text-white">
+          <CardHeader className="pb-4 sm:pb-6">
+            <div className="flex items-start justify-between flex-wrap gap-4">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-xl sm:text-2xl mb-2 leading-tight">{familyChallenge.title}</CardTitle>
+                <CardDescription className="text-blue-100 text-sm sm:text-base">
                   {familyChallenge.description}
                 </CardDescription>
               </div>
-              <Target className="h-8 w-8 text-blue-200" />
+              <Target className="h-6 w-6 sm:h-8 sm:w-8 text-blue-200 flex-shrink-0" />
             </div>
           </CardHeader>
           <CardContent>
@@ -194,17 +223,17 @@ const Index = () => {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-white/20">
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{familyMembers.length}</p>
-                  <p className="text-xs text-blue-100">Family Members</p>
+                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.length}</p>
+                  <p className="text-xs text-blue-100">Members</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{familyMembers.filter(m => m.last_activity === "Today").length}</p>
+                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.filter(m => m.last_activity === "Today").length}</p>
                   <p className="text-xs text-blue-100">Active Today</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold">{familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.streak)) : 0}</p>
+                  <p className="text-xl sm:text-2xl font-bold">{familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.streak)) : 0}</p>
                   <p className="text-xs text-blue-100">Best Streak</p>
                 </div>
               </div>
@@ -213,9 +242,9 @@ const Index = () => {
         </Card>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Leaderboard */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             <FamilyLeaderboard 
               members={transformedMembers}
               onCelebration={handleCelebration}
@@ -223,7 +252,7 @@ const Index = () => {
           </div>
 
           {/* Right Column */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
             {/* Activity Breakdown */}
             <ActivityBreakdown members={transformedMembers} />
 
