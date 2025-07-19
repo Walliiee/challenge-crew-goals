@@ -31,7 +31,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
     { id: "walking", name: "Walking", icon: Footprints },
     { id: "cycling", name: "Cycling", icon: Bike },
     { id: "swimming", name: "Swimming", icon: Waves },
-    { id: "hyre_hoj", name: "Hyre Hoj", icon: Mountain }
+    { id: "hyre hoj", name: "Hyre Høj", icon: Mountain }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -148,15 +148,15 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
 
               <div className="space-y-2">
                 <Label htmlFor="kilometers">
-                  {selectedActivity?.id === "hyre_hoj" ? "Number of Trips" : "Distance (kilometers)"}
+                  {selectedActivity?.id === "hyre hoj" ? "Number of Trips" : "Distance (kilometers)"}
                 </Label>
                 <Input
                   id="kilometers"
                   type="number"
-                  step={selectedActivity?.id === "hyre_hoj" ? "1" : "0.1"}
+                  step={selectedActivity?.id === "hyre hoj" ? "1" : "0.1"}
                   value={kilometers}
                   onChange={(e) => setKilometers(e.target.value)}
-                  placeholder={selectedActivity?.id === "hyre_hoj" ? "0" : "0.0"}
+                  placeholder={selectedActivity?.id === "hyre hoj" ? "0" : "0.0"}
                   required
                 />
               </div>
@@ -176,7 +176,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
               <div className="space-y-2">
                 <Label>Quick Add</Label>
                 <div className="flex space-x-2">
-                  {(selectedActivity?.id === "hyre_hoj" ? [1, 2, 3, 5] : [1, 2, 5, 10]).map((distance) => (
+                  {(selectedActivity?.id === "hyre hoj" ? [1, 2, 3, 5] : [1, 2, 5, 10]).map((distance) => (
                     <Button
                       key={distance}
                       type="button"
@@ -185,7 +185,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
                       onClick={() => setKilometers(distance.toString())}
                       className="flex-1"
                     >
-                      {distance}{selectedActivity?.id === "hyre_hoj" ? " trips" : "km"}
+                      {distance}{selectedActivity?.id === "hyre hoj" ? " trips" : "km"}
                     </Button>
                   ))}
                 </div>
