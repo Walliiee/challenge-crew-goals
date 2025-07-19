@@ -62,10 +62,17 @@ const Index = () => {
   const handleKilometerLog = async (data: any) => {
     const { kilometers, activityType, memberName, date } = data;
     
+    console.log('Logging activity:', data); // Debug log
+    
     try {
       // Find the family member
       const member = familyMembers.find(m => m.name === memberName);
-      if (!member) return;
+      if (!member) {
+        console.error('Member not found:', memberName);
+        return;
+      }
+
+      console.log('Found member:', member); // Debug log
 
       // Add activity log with the selected date
       await addActivity({
@@ -76,18 +83,23 @@ const Index = () => {
         notes: data.notes || null
       });
 
-      // Update distance totals
-      const updatedMember: any = {
-        kilometers: Number(member.kilometers) + Number(kilometers)
-      };
+      console.log('Activity logged successfully'); // Debug log
 
-      if (activityType === 'walking') {
-        updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
-      } else if (activityType === 'running') {
-        updatedMember.running_km = Number(member.running_km) + Number(kilometers);
+      // Update distance totals - only for distance-based activities
+      if (activityType !== 'hyre hoj') {
+        const updatedMember: any = {
+          kilometers: Number(member.kilometers) + Number(kilometers)
+        };
+
+        if (activityType === 'walking') {
+          updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
+        } else if (activityType === 'running') {
+          updatedMember.running_km = Number(member.running_km) + Number(kilometers);
+        }
+
+        await updateMember({ id: member.id, ...updatedMember });
+        console.log('Member stats updated'); // Debug log
       }
-
-      await updateMember({ id: member.id, ...updatedMember });
 
       // Recalculate streak based on all logs
       await recalcMemberStreak(member.id);
