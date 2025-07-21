@@ -40,7 +40,7 @@ const Index = () => {
     totalGoal: 300,
     totalProgress: familyMembers.reduce((sum, member) => sum + Number(member.kilometers), 0),
     endDate: "2025-07-31",
-    daysLeft: 20
+    daysLeft: Math.max(0, Math.ceil((new Date("2025-07-31").getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
   };
 
   const handleAddMember = async (newMember: any) => {
@@ -84,6 +84,7 @@ const Index = () => {
       });
 
       console.log('Activity logged successfully'); // Debug log
+      console.log('Activity type:', activityType); // Debug log
 
       // Update distance totals - only for distance-based activities
       if (activityType !== 'hyre hoj') {
