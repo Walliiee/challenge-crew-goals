@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,58 +7,55 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Activity, Footprints, Bike, Waves, CalendarIcon, Mountain } from "lucide-react";
+import { Activity, Footprints, Bike, Waves, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
-interface KilometersUploadModalProps {
+interface EditActivityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (data: any) => void;
+  onSave: (data: any) => void;
   familyMembers: any[];
+  initialActivity: any;
 }
 
-const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: KilometersUploadModalProps) => {
-  const [kilometers, setKilometers] = useState("");
+const EditActivityModal = ({ isOpen, onClose, onSave, familyMembers, initialActivity }: EditActivityModalProps) => {
+  const [kilometers, setKilometers] = useState("0");
   const [activityType, setActivityType] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
   const [notes, setNotes] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
+  useEffect(() => {
+    if (initialActivity) {
+      setKilometers(String(initialActivity.kilometers));
+      setActivityType(initialActivity.activity_type);
+      const member = familyMembers.find(m => m.id === initialActivity.family_member_id);
+      setSelectedMember(member ? member.name : "");
+      setNotes(initialActivity.notes || "");
+      setSelectedDate(new Date(initialActivity.date));
+    }
+  }, [initialActivity, familyMembers]);
+
   const activityTypes = [
     { id: "running", name: "Running", icon: Activity },
     { id: "walking", name: "Walking", icon: Footprints },
     { id: "cycling", name: "Cycling", icon: Bike },
-    { id: "swimming", name: "Swimming", icon: Waves },
-    { id: "hyre hoj", name: "Hyre Høj", icon: Mountain }
+    { id: "swimming", name: "Swimming", icon: Waves }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Format date properly as YYYY-MM-DD
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-    
     const data = {
       kilometers: parseFloat(kilometers),
       activityType,
       memberName: selectedMember,
       notes,
-      date: formattedDate,
-      timestamp: new Date().toISOString()
+      date: formattedDate
     };
-    
-    console.log('Submitting activity data:', data);
-    
-    onSuccess(data);
+    onSave(data);
     onClose();
-    
-    // Reset form
-    setKilometers("");
-    setActivityType("");
-    setSelectedMember("");
-    setNotes("");
-    setSelectedDate(new Date());
   };
 
   const selectedActivity = activityTypes.find(a => a.id === activityType);
@@ -70,17 +66,17 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Activity className="h-5 w-5 mr-2 text-green-500" />
-            Log Kilometers
+            Edit Activity
           </DialogTitle>
           <DialogDescription>
-            Add kilometers for a family member
+            Update logged activity details
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="member">Family Member</Label>
-            <Select onValueChange={setSelectedMember} required>
+            <Select value={selectedMember} onValueChange={setSelectedMember} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select family member" />
               </SelectTrigger>
@@ -96,7 +92,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
 
           <div className="space-y-2">
             <Label htmlFor="activity">Activity Type</Label>
-            <Select onValueChange={setActivityType} required>
+            <Select value={activityType} onValueChange={setActivityType} required>
               <SelectTrigger>
                 <SelectValue placeholder="Choose activity" />
               </SelectTrigger>
@@ -147,16 +143,14 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="kilometers">
-                  {selectedActivity?.id === "hyre hoj" ? "Number of Trips" : "Distance (kilometers)"}
-                </Label>
+                <Label htmlFor="kilometers">Distance (kilometers)</Label>
                 <Input
                   id="kilometers"
                   type="number"
-                  step={selectedActivity?.id === "hyre hoj" ? "1" : "0.1"}
+                  step="0.1"
                   value={kilometers}
                   onChange={(e) => setKilometers(e.target.value)}
-                  placeholder={selectedActivity?.id === "hyre hoj" ? "0" : "0.0"}
+                  placeholder="0.0"
                   required
                 />
               </div>
@@ -171,25 +165,6 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
                   rows={2}
                 />
               </div>
-
-              {/* Quick Distance Buttons */}
-              <div className="space-y-2">
-                <Label>Quick Add</Label>
-                <div className="flex space-x-2">
-                  {(selectedActivity?.id === "hyre hoj" ? [1, 2, 3, 5] : [1, 2, 5, 10]).map((distance) => (
-                    <Button
-                      key={distance}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setKilometers(distance.toString())}
-                      className="flex-1"
-                    >
-                      {distance}{selectedActivity?.id === "hyre hoj" ? " trips" : "km"}
-                    </Button>
-                  ))}
-                </div>
-              </div>
             </>
           )}
 
@@ -197,12 +172,12 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={!activityType || !kilometers || !selectedMember}
               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
             >
-              Log Activity
+              Save Changes
             </Button>
           </DialogFooter>
         </form>
@@ -211,4 +186,4 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
   );
 };
 
-export default KilometersUploadModal;
+export default EditActivityModal;
