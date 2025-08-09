@@ -33,6 +33,14 @@ const Index = () => {
     lastActivity: member.last_activity
   }));
 
+  // Filter and transform for "Sam vs Krohn" challenge (walking + running only)
+  const samKrohnMembers = transformedMembers
+    .filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))
+    .map(m => ({
+      ...m,
+      kilometers: Number(m.walkingKm) + Number(m.runningKm),
+    }));
+
   // Family kilometers challenge data
   const familyChallenge = {
     title: "Family Kilometers Challenge",
@@ -258,10 +266,14 @@ const Index = () => {
 
         {/* Content Tabs */}
         <Tabs defaultValue="kilometers" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="kilometers" className="flex items-center space-x-2">
               <Trophy className="h-4 w-4" />
               <span>Kilometers Challenge</span>
+            </TabsTrigger>
+            <TabsTrigger value="sam-krohn" className="flex items-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span>Sam vs Krohn</span>
             </TabsTrigger>
             <TabsTrigger value="hyre-hoj" className="flex items-center space-x-2">
               <Mountain className="h-4 w-4" />
@@ -362,6 +374,52 @@ const Index = () => {
                       <span className="text-gray-600">Family Average:</span>
                       <span className="font-medium">{familyMembers.length > 0 ? (familyChallenge.totalProgress / familyMembers.length).toFixed(1) : '0.0'}km</span>
                     </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sam-krohn">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {/* Leaderboard */}
+              <div className="lg:col-span-2 order-2 lg:order-1">
+                <FamilyLeaderboard 
+                  members={samKrohnMembers}
+                  onCelebration={handleCelebration}
+                />
+              </div>
+
+              {/* Right Column */}
+              <div className="lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
+                {/* Activity Breakdown */}
+                <ActivityBreakdown members={samKrohnMembers} />
+
+                {/* Activity Calendar */}
+                <ActivityCalendar />
+
+                {/* Quick Actions & Info */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-lg">
+                      <Target className="h-5 w-5 mr-2 text-green-500" />
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button 
+                      onClick={() => setIsUploadModalOpen(true)}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                    >
+                      Log Kilometers
+                    </Button>
+                    <Button 
+                      onClick={() => setIsAddMemberModalOpen(true)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Add Family Member
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
