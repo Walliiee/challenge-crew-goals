@@ -186,16 +186,30 @@ const ActivityCalendar = () => {
 
         {/* Quick Stats */}
         <div className="pt-3 border-t border-gray-200">
-          <h4 className="font-semibold text-sm mb-2">This Month</h4>
+          <h4 className="font-semibold text-sm mb-2">This Month (August)</h4>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="text-center p-2 bg-blue-50 rounded">
-              <p className="font-bold text-blue-600">{activityLogs.length}</p>
+              <p className="font-bold text-blue-600">{
+                activityLogs.filter(log => {
+                  const d = new Date(log.date as string);
+                  const y = new Date().getFullYear();
+                  const start = new Date(y, 7, 1);
+                  const end = new Date(y, 8, 0);
+                  return d >= start && d <= end;
+                }).length
+              }</p>
               <p className="text-blue-500">Total Activities</p>
             </div>
             <div className="text-center p-2 bg-green-50 rounded">
-              <p className="font-bold text-green-600">
-                {activityLogs.reduce((sum, log) => sum + Number(log.kilometers), 0).toFixed(1)}km
-              </p>
+              <p className="font-bold text-green-600">{
+                activityLogs.filter(log => {
+                  const d = new Date(log.date as string);
+                  const y = new Date().getFullYear();
+                  const start = new Date(y, 7, 1);
+                  const end = new Date(y, 8, 0);
+                  return d >= start && d <= end;
+                }).reduce((sum, log) => sum + Number(log.kilometers), 0).toFixed(1)
+              }km</p>
               <p className="text-green-500">Total Distance</p>
             </div>
           </div>

@@ -33,22 +33,54 @@ const Index = () => {
     lastActivity: member.last_activity
   }));
 
-  // Filter and transform for "Sam vs Krohn" challenge (walking + running only)
-  const samKrohnMembers = transformedMembers
-    .filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))
-    .map(m => ({
-      ...m,
-      kilometers: Number(m.walkingKm) + Number(m.runningKm),
-    }));
+  // Compute August (current year) only stats from activity logs (walking + running)
+  const currentYear = new Date().getFullYear();
+  const augustStart = new Date(currentYear, 7, 1);
+  const augustEnd = new Date(currentYear, 8, 0);
 
-  // Family kilometers challenge data
+  // Filter logs for August and distance-based activities
+  const augustLogs = activityLogs.filter(log => {
+    const d = new Date(log.date as string);
+    return d >= augustStart && d <= augustEnd && (log.activity_type === 'walking' || log.activity_type === 'running');
+  });
+
+  // Aggregate per member for August
+  const augustTotalsByMember = augustLogs.reduce<Record<string, { walking: number; running: number }>>((acc, log) => {
+    const id = log.family_member_id as string;
+    if (!acc[id]) acc[id] = { walking: 0, running: 0 };
+    if (log.activity_type === 'walking') acc[id].walking += Number(log.kilometers);
+    if (log.activity_type === 'running') acc[id].running += Number(log.kilometers);
+    return acc;
+  }, {});
+
+  // Build August-only members view
+  const augustMembers = familyMembers.map(member => {
+    const totals = augustTotalsByMember[member.id] || { walking: 0, running: 0 };
+    const walkingKm = totals.walking;
+    const runningKm = totals.running;
+    return {
+      ...member,
+      walkingKm,
+      runningKm,
+      lastActivity: member.last_activity,
+      kilometers: Number((walkingKm + runningKm).toFixed(1)),
+    };
+  });
+
+  // "Sam vs Krohn" challenge for August (walking + running only)
+  const samKrohnMembers = augustMembers
+    .filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))
+    .map(m => ({ ...m }));
+
+  // Family kilometers challenge data (August only)
+  const augustEndDateStr = `${currentYear}-08-${String(augustEnd.getDate()).padStart(2, '0')}`;
   const familyChallenge = {
     title: "Family Kilometers Challenge",
-    description: "Let's reach 300km together this month!",
+    description: "Let's reach 300km together this August!",
     totalGoal: 300,
-    totalProgress: familyMembers.reduce((sum, member) => sum + Number(member.kilometers), 0),
-    endDate: "2025-07-31",
-    daysLeft: Math.max(0, Math.ceil((new Date("2025-07-31").getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
+    totalProgress: augustMembers.reduce((sum, m) => sum + Number(m.kilometers), 0),
+    endDate: augustEndDateStr,
+    daysLeft: Math.max(0, Math.ceil((augustEnd.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))
   };
 
   const handleAddMember = async (newMember: any) => {
@@ -286,7 +318,7 @@ const Index = () => {
               {/* Leaderboard */}
               <div className="lg:col-span-2 order-2 lg:order-1">
                 <FamilyLeaderboard 
-                  members={transformedMembers}
+                  members={augustMembers}
                   onCelebration={handleCelebration}
                 />
               </div>
@@ -294,7 +326,7 @@ const Index = () => {
               {/* Right Column */}
               <div className="lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
                 {/* Activity Breakdown */}
-                <ActivityBreakdown members={transformedMembers} />
+                <ActivityBreakdown members={augustMembers} />
 
                 {/* Activity Calendar */}
                 <ActivityCalendar />
@@ -495,7 +527,7 @@ const Index = () => {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={handleKilometerLog}
-        familyMembers={familyMembers}
+        familyMembers={familyMembers.filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))}
       />
 
       <AddFamilyMemberModal 
