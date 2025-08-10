@@ -2,9 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus, LogOut, Mountain } from "lucide-react";
+import { Trophy, Users, Plus, Target, Calendar, Flame, UserPlus, LogOut } from "lucide-react";
 import FamilyLeaderboard from "@/components/FamilyLeaderboard";
-import HyreHojLeaderboard from "@/components/HyreHojLeaderboard";
 import KilometersUploadModal from "@/components/KilometersUploadModal";
 import AddFamilyMemberModal from "@/components/AddFamilyMemberModal";
 import ActivityBreakdown from "@/components/ActivityBreakdown";
@@ -114,30 +113,27 @@ const Index = () => {
 
       console.log('Found member:', member); // Debug log
 
-      // Normalize activity type to satisfy DB constraint
-      const dbActivityType = activityType === 'swimming' ? 'other' : activityType;
-
       // Add activity log with the selected date
       await addActivity({
         family_member_id: member.id,
-        activity_type: dbActivityType,
+        activity_type: activityType,
         kilometers: Number(kilometers),
         date: date, // Use the selected date from the form
         notes: data.notes || null
       });
 
       console.log('Activity logged successfully'); // Debug log
-      console.log('Activity type:', dbActivityType); // Debug log
+      console.log('Activity type:', activityType); // Debug log
 
-      // Update distance totals - only for distance-based activities
-      if (dbActivityType !== 'hyre_hoj') {
+      // Update distance totals for walking/running only
+      if (activityType === 'walking' || activityType === 'running') {
         const updatedMember: any = {
           kilometers: Number(member.kilometers) + Number(kilometers)
         };
 
-        if (dbActivityType === 'walking') {
+        if (activityType === 'walking') {
           updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
-        } else if (dbActivityType === 'running') {
+        } else if (activityType === 'running') {
           updatedMember.running_km = Number(member.running_km) + Number(kilometers);
         }
 
@@ -310,10 +306,6 @@ const Index = () => {
               <Users className="h-4 w-4" />
               <span>Sam vs Krohn</span>
             </TabsTrigger>
-            <TabsTrigger value="hyre-hoj" className="flex items-center space-x-2">
-              <Mountain className="h-4 w-4" />
-              <span>Hyre Høj Challenge</span>
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="kilometers">
@@ -461,67 +453,6 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="hyre-hoj">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {/* Hyre Høj Leaderboard */}
-              <div className="lg:col-span-2 order-2 lg:order-1">
-                <HyreHojLeaderboard />
-              </div>
-
-              {/* Right Column */}
-              <div className="lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
-                {/* Quick Actions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-lg">
-                      <Mountain className="h-5 w-5 mr-2 text-green-600" />
-                      Log Hyre Høj Trip
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button 
-                      onClick={() => setIsUploadModalOpen(true)}
-                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                    >
-                      Log Trip
-                    </Button>
-                    <p className="text-xs text-gray-600 text-center">
-                      Record your climb to the summit of Hyre Høj
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Activity Calendar */}
-                <ActivityCalendar />
-
-                {/* Challenge Info */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Mountain Stats</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Climbs:</span>
-                      <span className="font-medium">{activityLogs.filter(log => log.activity_type === 'hyre_hoj').reduce((sum, log) => sum + Number(log.kilometers), 0)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Active Climbers:</span>
-                      <span className="font-medium">{new Set(activityLogs.filter(log => log.activity_type === 'hyre_hoj').map(log => log.family_member_id)).size}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">This Month:</span>
-                      <span className="font-medium">
-                        {activityLogs.filter(log => 
-                          log.activity_type === 'hyre_hoj' && 
-                          new Date(log.date).getMonth() === new Date().getMonth()
-                        ).reduce((sum, log) => sum + Number(log.kilometers), 0)}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
 
