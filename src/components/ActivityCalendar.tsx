@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EditActivityModal from "@/components/EditActivityModal";
-import { Activity, Footprints, Bike, Calendar as CalendarIcon, Pencil } from "lucide-react";
+import { Activity, Footprints, Bike, Calendar as CalendarIcon, Pencil, Mountain } from "lucide-react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { recalcMemberStreak } from "@/lib/streak";
@@ -33,6 +33,8 @@ const ActivityCalendar = () => {
         return <Footprints className="h-3 w-3" />;
       case 'cycling':
         return <Bike className="h-3 w-3" />;
+      case 'hyre_hoj':
+        return <Mountain className="h-3 w-3" />;
       default:
         return <Activity className="h-3 w-3" />;
     }
@@ -46,6 +48,8 @@ const ActivityCalendar = () => {
         return 'bg-blue-100 text-blue-700';
       case 'cycling':
         return 'bg-green-100 text-green-700';
+      case 'hyre_hoj':
+        return 'bg-purple-100 text-purple-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }
@@ -159,7 +163,9 @@ const ActivityCalendar = () => {
                     <span className="text-sm font-medium">{getMemberName(activity.family_member_id)}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-bold text-blue-600">{activity.kilometers}km</span>
+                    <span className="text-sm font-bold text-blue-600">
+                      {activity.activity_type === 'hyre_hoj' ? `${activity.kilometers} trips` : `${activity.kilometers}km`}
+                    </span>
                     <Button variant="ghost" size="icon" onClick={() => setEditingActivity(activity)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -172,7 +178,10 @@ const ActivityCalendar = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-600">Daily Total:</span>
                   <span className="text-lg font-bold text-green-600">
-                    {selectedDateActivities.reduce((sum, activity) => sum + Number(activity.kilometers), 0).toFixed(1)}km
+                    {selectedDateActivities
+                      .filter(a => a.activity_type !== 'hyre_hoj')
+                      .reduce((sum, activity) => sum + Number(activity.kilometers), 0)
+                      .toFixed(1)}km
                   </span>
                 </div>
               </div>
@@ -207,7 +216,7 @@ const ActivityCalendar = () => {
                   const y = new Date().getFullYear();
                   const start = new Date(y, 7, 1);
                   const end = new Date(y, 8, 0);
-                  return d >= start && d <= end;
+                  return d >= start && d <= end && log.activity_type !== 'hyre_hoj';
                 }).reduce((sum, log) => sum + Number(log.kilometers), 0).toFixed(1)
               }km</p>
               <p className="text-green-500">Total Distance</p>

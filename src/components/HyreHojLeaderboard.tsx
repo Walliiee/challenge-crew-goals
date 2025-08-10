@@ -12,7 +12,7 @@ const HyreHojLeaderboard = () => {
 
   // Filter for "hyre hoj" activities only
   const hyreHojLogs = useMemo(() => {
-    return activityLogs.filter(log => log.activity_type === 'hyre hoj');
+    return activityLogs.filter(log => log.activity_type === 'hyre_hoj');
   }, [activityLogs]);
 
   // Calculate daily leaderboard (today's trips)

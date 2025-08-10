@@ -114,27 +114,30 @@ const Index = () => {
 
       console.log('Found member:', member); // Debug log
 
+      // Normalize activity type to satisfy DB constraint
+      const dbActivityType = activityType === 'swimming' ? 'other' : activityType;
+
       // Add activity log with the selected date
       await addActivity({
         family_member_id: member.id,
-        activity_type: activityType,
+        activity_type: dbActivityType,
         kilometers: Number(kilometers),
         date: date, // Use the selected date from the form
         notes: data.notes || null
       });
 
       console.log('Activity logged successfully'); // Debug log
-      console.log('Activity type:', activityType); // Debug log
+      console.log('Activity type:', dbActivityType); // Debug log
 
       // Update distance totals - only for distance-based activities
-      if (activityType !== 'hyre hoj') {
+      if (dbActivityType !== 'hyre_hoj') {
         const updatedMember: any = {
           kilometers: Number(member.kilometers) + Number(kilometers)
         };
 
-        if (activityType === 'walking') {
+        if (dbActivityType === 'walking') {
           updatedMember.walking_km = Number(member.walking_km) + Number(kilometers);
-        } else if (activityType === 'running') {
+        } else if (dbActivityType === 'running') {
           updatedMember.running_km = Number(member.running_km) + Number(kilometers);
         }
 
@@ -499,17 +502,17 @@ const Index = () => {
                   <CardContent className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Climbs:</span>
-                      <span className="font-medium">{activityLogs.filter(log => log.activity_type === 'hyre hoj').reduce((sum, log) => sum + Number(log.kilometers), 0)}</span>
+                      <span className="font-medium">{activityLogs.filter(log => log.activity_type === 'hyre_hoj').reduce((sum, log) => sum + Number(log.kilometers), 0)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Active Climbers:</span>
-                      <span className="font-medium">{new Set(activityLogs.filter(log => log.activity_type === 'hyre hoj').map(log => log.family_member_id)).size}</span>
+                      <span className="font-medium">{new Set(activityLogs.filter(log => log.activity_type === 'hyre_hoj').map(log => log.family_member_id)).size}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">This Month:</span>
                       <span className="font-medium">
                         {activityLogs.filter(log => 
-                          log.activity_type === 'hyre hoj' && 
+                          log.activity_type === 'hyre_hoj' && 
                           new Date(log.date).getMonth() === new Date().getMonth()
                         ).reduce((sum, log) => sum + Number(log.kilometers), 0)}
                       </span>
@@ -527,7 +530,7 @@ const Index = () => {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={handleKilometerLog}
-        familyMembers={familyMembers.filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))}
+        familyMembers={familyMembers}
       />
 
       <AddFamilyMemberModal 
