@@ -72,6 +72,19 @@ const Index = () => {
     .filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))
     .map(m => ({ ...m }));
 
+  // Split Sam vs Krohn into walking-only and running-only leaderboards
+  const samKrohnWalkingMembers = samKrohnMembers.map(m => ({
+    ...m,
+    kilometers: Number(m.walkingKm.toFixed(1)),
+    runningKm: 0,
+  }));
+
+  const samKrohnRunningMembers = samKrohnMembers.map(m => ({
+    ...m,
+    kilometers: Number(m.runningKm.toFixed(1)),
+    walkingKm: 0,
+  }));
+
   // Family kilometers challenge data (August only)
   const augustEndDateStr = `${currentYear}-08-${String(augustEnd.getDate()).padStart(2, '0')}`;
   const familyChallenge = {
@@ -416,10 +429,26 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {/* Leaderboard */}
               <div className="lg:col-span-2 order-2 lg:order-1">
-                <FamilyLeaderboard 
-                  members={samKrohnMembers}
-                  onCelebration={handleCelebration}
-                />
+                <Tabs defaultValue="walking" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="walking">Walking</TabsTrigger>
+                    <TabsTrigger value="running">Running</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="walking">
+                    <FamilyLeaderboard 
+                      members={samKrohnWalkingMembers}
+                      onCelebration={handleCelebration}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="running">
+                    <FamilyLeaderboard 
+                      members={samKrohnRunningMembers}
+                      onCelebration={handleCelebration}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
 
               {/* Right Column */}
