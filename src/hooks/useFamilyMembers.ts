@@ -64,13 +64,30 @@ export const useFamilyMembers = () => {
     }
   });
 
+  const deleteMemberMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('family_members')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['family-members'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+    }
+  });
+
   return {
     familyMembers,
     isLoading,
     error,
     addMember: addMemberMutation.mutateAsync,
     updateMember: updateMemberMutation.mutateAsync,
+    deleteMember: deleteMemberMutation.mutateAsync,
     isAddingMember: addMemberMutation.isPending,
-    isUpdatingMember: updateMemberMutation.isPending
+    isUpdatingMember: updateMemberMutation.isPending,
+    isDeletingMember: deleteMemberMutation.isPending
   };
 };

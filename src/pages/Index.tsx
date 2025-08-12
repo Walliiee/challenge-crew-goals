@@ -21,7 +21,7 @@ const Index = () => {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [celebrationData, setCelebrationData] = useState(null);
   
-  const { familyMembers, addMember, updateMember } = useFamilyMembers();
+  const { familyMembers, addMember, updateMember, deleteMember } = useFamilyMembers();
   const { addActivity, activityLogs } = useActivityLogs();
   const { user, signOut } = useAuth();
 
@@ -528,6 +528,7 @@ const Index = () => {
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={handleKilometerLog}
         familyMembers={familyMembers.filter(m => ['sam', 'krohn'].includes(m.name.toLowerCase()))}
+        onDeleteMember={deleteMember}
       />
 
       <AddFamilyMemberModal 

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Activity, Footprints, Bike, Waves, CalendarIcon, Mountain } from "lucide-react";
+import { Activity, Footprints, Bike, Waves, CalendarIcon, Mountain, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -17,9 +17,10 @@ interface KilometersUploadModalProps {
   onClose: () => void;
   onSuccess: (data: any) => void;
   familyMembers: any[];
+  onDeleteMember: (id: string) => Promise<void>;
 }
 
-const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: KilometersUploadModalProps) => {
+const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers, onDeleteMember }: KilometersUploadModalProps) => {
   const [kilometers, setKilometers] = useState("");
   const [activityType, setActivityType] = useState("");
   const [selectedMember, setSelectedMember] = useState("");
@@ -87,7 +88,22 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers }: Ki
               <SelectContent>
                 {familyMembers.map((member) => (
                   <SelectItem key={member.name} value={member.name}>
-                    {member.name}
+                    <div className="flex items-center justify-between w-full">
+                      <span>{member.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Delete ${member.name}? This will remove all their activity logs.`)) {
+                            onDeleteMember(member.id);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
