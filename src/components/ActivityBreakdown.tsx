@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Footprints, Activity } from "lucide-react";
 
 interface FamilyMember {
+  id: string;
   name: string;
   walkingKm: number;
   runningKm: number;
@@ -68,7 +69,7 @@ const ActivityBreakdown = ({ members }: ActivityBreakdownProps) => {
             const memberRunningPct = memberTotal > 0 ? Math.round((member.runningKm / memberTotal) * 100) : 0;
 
             return (
-              <div key={member.name} className="p-3 bg-gray-50 rounded-lg">
+              <div key={member.id} className="p-3 bg-gray-50 rounded-lg">
                 <h4 className="font-medium mb-3">{member.name}</h4>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">

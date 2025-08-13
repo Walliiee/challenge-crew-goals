@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, Medal, Award, Flame, Calendar, Activity, Footprints } from "lucide-react";
 
 interface FamilyMember {
+  id: string;
   name: string;
   kilometers: number;
   walkingKm: number;
@@ -92,7 +93,7 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
           const rank = index + 1;
           return (
             <Card 
-              key={member.name}
+              key={member.id}
               className={`text-center cursor-pointer hover:shadow-lg transition-all duration-200 touch-manipulation ${
                 rank === 1 ? 'sm:scale-105 border-2 border-yellow-200' : ''
               }`}
@@ -160,7 +161,7 @@ const FamilyLeaderboard = ({ members, onCelebration }: FamilyLeaderboardProps) =
               const rank = index + 1;
               return (
                 <div 
-                  key={member.name}
+                  key={member.id}
                   className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer touch-manipulation"
                   onClick={() => handleCelebration(member, rank)}
                 >
