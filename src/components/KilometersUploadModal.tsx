@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Activity, Footprints, Bike, Waves, CalendarIcon, Mountain, Trash2 } from "lucide-react";
+import { Activity, Footprints, Bike, Waves, CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -31,8 +31,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers, onDe
     { id: "running", name: "Running", icon: Activity },
     { id: "walking", name: "Walking", icon: Footprints },
     { id: "cycling", name: "Cycling", icon: Bike },
-    { id: "swimming", name: "Swimming", icon: Waves },
-    { id: "hyre hoj", name: "Hyre Høj", icon: Mountain }
+    { id: "swimming", name: "Swimming", icon: Waves }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -164,15 +163,15 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers, onDe
 
               <div className="space-y-2">
                 <Label htmlFor="kilometers">
-                  {selectedActivity?.id === "hyre hoj" ? "Number of Trips" : "Distance (kilometers)"}
+                  Distance (kilometers)
                 </Label>
                 <Input
                   id="kilometers"
                   type="number"
-                  step={selectedActivity?.id === "hyre hoj" ? "1" : "0.1"}
+                  step="0.1"
                   value={kilometers}
                   onChange={(e) => setKilometers(e.target.value)}
-                  placeholder={selectedActivity?.id === "hyre hoj" ? "0" : "0.0"}
+                  placeholder="0.0"
                   required
                 />
               </div>
@@ -192,7 +191,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers, onDe
               <div className="space-y-2">
                 <Label>Quick Add</Label>
                 <div className="flex space-x-2">
-                  {(selectedActivity?.id === "hyre hoj" ? [1, 2, 3, 5] : [1, 2, 5, 10]).map((distance) => (
+                  {[1, 2, 5, 10].map((distance) => (
                     <Button
                       key={distance}
                       type="button"
@@ -201,7 +200,7 @@ const KilometersUploadModal = ({ isOpen, onClose, onSuccess, familyMembers, onDe
                       onClick={() => setKilometers(distance.toString())}
                       className="flex-1"
                     >
-                      {distance}{selectedActivity?.id === "hyre hoj" ? " trips" : "km"}
+                      {distance}km
                     </Button>
                   ))}
                 </div>
